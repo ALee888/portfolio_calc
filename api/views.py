@@ -11,7 +11,7 @@ class YourView(APIView):
         stocks = []
         for stock in data['stocks']:
             stocks.append(stock[0])
-        stockData = self.getStockData(data['startDate'], data['initialBalance'], stocks)
+        stockData = self.getStockData(data['startDate'], stocks)
         #stockTotals = self.calculateStocks(data['initialBalance'], data['stocks'])
             
         return Response(stockData)
