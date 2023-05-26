@@ -2,18 +2,26 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
 import json
+import os
 
 class YourView(APIView):
     def post(self, request):
         data = request.data  # Access the JSON payload from the request body
         print(data)
-        #stockData = self.getStockData(data['startDate'], data['initialBalance'], data['stocks'])
-        stockData = self.calculateStocks(data['initialBalance'], data['stocks'])
-        
+        stocks = []
+        for stock in data['stocks']:
+            stocks.append(stock[0])
+        stockData = self.getStockData(data['startDate'], data['initialBalance'], stocks)
+        #stockTotals = self.calculateStocks(data['initialBalance'], data['stocks'])
+            
         return Response(stockData)
-    def getStockData(self):
-        stockData = {}
-        
+    
+    def getStockData(self, startDate, stocks):
+        params = {
+            'access_key': os.environ.get("access_key"),
+            'symbols': stocks,
+            'date_from': startDate,
+        }
         api_result = requests.get('http://api.marketstack.com/v1/eod', params)
 
         api_response = api_result.json()
@@ -25,7 +33,7 @@ class YourView(APIView):
                 stock_data['date']
             ))
         
-        return stockData   
+        return api_response   
 
     def calculateStocks(self, total, stocks):
         stockTotals = {}
